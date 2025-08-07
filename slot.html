@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Slot Booking Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .slot {
+      display: inline-block;
+      margin: 5px;
+      padding: 10px 15px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .slot.booked {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .slot.selected {
+      background: #4caf50;
+      color: white;
+    }
+    .message {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Slot Booking System</h2>
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" placeholder="Enter your name" required />
+
+    <label for="date">Select Date:</label>
+    <input type="date" id="date" required />
+
+    <label>Select Time Slot:</label>
+    <div id="slots"></div>
+
+    <button onclick="bookSlot()">Book Slot</button>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    const availableSlots = [
+      "10:00 AM", "11:00 AM", "12:00 PM",
+      "1:00 PM", "2:00 PM", "3:00 PM",
+      "4:00 PM", "5:00 PM"
+    ];
+
+    const bookedSlots = {}; // Format: { "YYYY-MM-DD": ["10:00 AM"] }
+
+    const slotContainer = document.getElementById("slots");
+    const messageBox = document.getElementById("message");
+    let selectedSlot = null;
+
+    function renderSlots() {
+      slotContainer.innerHTML = '';
+      const date = document.getElementById("date").value;
+      const todayBooked = bookedSlots[date] || [];
+
+      availableSlots.forEach(time => {
+        const div = document.createElement("div");
+        div.classList.add("slot");
+        div.textContent = time;
+
+        if (todayBooked.includes(time)) {
+          div.classList.add("booked");
+        } else {
+          div.onclick = () => {
+            document.querySelectorAll(".slot").forEach(s => s.classList.remove("selected"));
+            div.classList.add("selected");
+            selectedSlot = time;
+          };
+        }
+
+        slotContainer.appendChild(div);
+      });
+    }
+
+    function bookSlot() {
+      const name = document.getElementById("name").value;
+      const date = document.getElementById("date").value;
+
+      if (!name || !date || !selectedSlot) {
+        messageBox.style.color = "red";
+        messageBox.textContent = "Please fill all fields and select a slot.";
+        return;
+      }
+
+      if (!bookedSlots[date]) bookedSlots[date] = [];
+      bookedSlots[date].push(selectedSlot);
+
+      messageBox.style.color = "green";
+      messageBox.textContent = ${name}, your slot at ${selectedSlot} on ${date} is booked!;
+
+      selectedSlot = null;
+      renderSlots();
+    }
+
+    document.getElementById("date").addEventListener("change", renderSlots);
+  </script>
+</body>
+</html>
